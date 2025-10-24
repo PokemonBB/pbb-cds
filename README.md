@@ -56,9 +56,9 @@ pbb-cds/
 - **Autenticación**: No requerida
 - **Respuesta**: Estado del servidor y timestamp
 
-#### GET /docs
+#### GET /docs, /swagger, /api
 
-- **Descripción**: Documentación Swagger UI
+- **Descripción**: Documentación Swagger UI (disponible en 3 endpoints)
 - **Autenticación**: No requerida
 
 ## Desarrollo
@@ -83,7 +83,9 @@ pbb-cds/
    ```
 
 4. Acceder a la documentación:
-   - API: http://localhost:3000/docs
+   - API Docs: http://localhost:3000/docs
+   - API Docs: http://localhost:3000/swagger
+   - API Docs: http://localhost:3000/api
    - Health: http://localhost:3000/health
 
 ## Características

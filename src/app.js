@@ -61,7 +61,10 @@ async function startServer() {
     console.log(`PBB-CDS server running on port ${PORT}`);
     console.log(`Content API available at: http://localhost:${PORT}/api/content`);
     console.log(`Health check available at: http://localhost:${PORT}/health`);
-    console.log(`API Documentation available at: http://localhost:${PORT}/docs`);
+    console.log(`API Documentation available at:`);
+    console.log(`  - http://localhost:${PORT}/docs`);
+    console.log(`  - http://localhost:${PORT}/swagger`);
+    console.log(`  - http://localhost:${PORT}/api`);
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
