@@ -1,0 +1,17 @@
+{
+  "name": "pbb-cds",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "fastify": "^4.24.3",
+    "yauzl": "^3.0.0",
+    "fs-extra": "^11.1.1"
+  },
+  "repository": "git@github.com:PokemonBB/pbb-cds.git",
+  "author": "borrageiros <adrianborrageirosmourelos@gmail.com>",
+  "license": "MIT"
+}
