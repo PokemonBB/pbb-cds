@@ -1,0 +1,152 @@
+<html lang="en"><head>
+	<meta charset="utf-8">
+	<title>GMSprView</title>
+	<meta name="description" content="">
+	<link rel="stylesheet" href="shared.css">
+	<link rel="stylesheet" href="style.css">
+	
+	<meta property="theme-color" content="#FFF037">
+	
+	<meta property="og:image" content="https://yal.cc/tools/gmsprview/opengraph.png">
+	<meta property="og:image:width" content="800">
+	<meta property="og:image:height" content="360">
+	<meta property="og:description" content="A tool for viewing and converting GMSpr files">
+	<meta property="og:type" content="article">
+	<meta property="og:locale" content="en_us">
+	<meta property="og:site_name" content="YellowAfterlife">
+	<meta property="og:title" content="GMSprView">
+	<meta property="og:url" content="https://yal.cc/tools/gmsprview/">
+	
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:title" content="GMSprView">
+	<meta property="twitter:description" content="A tool for viewing and converting GMSpr files">
+	<meta property="twitter:image" content="https://yal.cc/tools/gmsprview/opengraph.png">
+	<meta property="twitter:image:width" content="800">
+	<meta property="twitter:image:height" content="360">
+	<meta property="twitter:url" content="https://yal.cc/tools/gmsprview/">
+</head>
+<body>
+	<input type="checkbox" id="readme-toggle" style="display:none" checked="">
+	<table id="main"><tbody><tr>
+	<td id="nav-td" width="200" valign="top">
+		<div class="top" style="position:relative">
+			<ul id="menu" style="display:none">
+				<li id="picker_pre" onclick="document.getElementById('picker').click(); document.getElementById('menu').style.display = 'none'">
+					Open...
+				</li>
+				<li id="save-strip">
+					Save strip...
+				</li>
+				<li id="save-frames">
+					Show frames...
+				</li>
+				<li class="menu-separator"></li>
+				<label class="li" for="readme-toggle">Show README</label>
+			</ul><input type="button" value="Menu!" onclick="document.getElementById('menu').style.display = ''"> <label id="filename">P100_2.gmspr</label>
+		</div><div class="bottom"><div id="nav" style="line-height: 1.25; width: 200px;">
+			Format version: <span id="sprite-version">800</span><br>
+			<span id="sprite-width">16</span>x<span id="sprite-height">16</span>, <span id="sprite-frames">4</span> frames<br>
+			Origin: <span id="orig-x">8</span>,<span id="orig-y">8</span><br>
+			Collision mask kind: <span id="col-kind">precise</span><br>
+			Col. mask tolerance: <span id="col-tol">0</span><br>
+			BBox kind: <span id="bbox-kind">automatic</span><br>
+			Per-frame mask: <span id="bbox-sep">false</span>
+			Bounding box: <span id="bbox-bounds">[0,15,15,0]</span>
+		</div></div>
+	</td>
+	<td id="splitter-td" width="5">
+		
+	</td>
+	<td id="code-td" valign="top">
+		<div class="top">
+			<div class="about">by
+				<a href="https://twitter.com/YellowAfterlife">@YellowAfterlife</a>
+			</div>
+			<span id="status">
+				<input type="button" value="&lt;" id="prev-frame">
+				<input type="button" value="&gt;" id="next-frame">
+				<label><input type="checkbox" id="animate"> animate at </label>
+				<input type="text" value="1" style="width:2em" id="anim-speed">x speed at
+				<input type="text" value="30" style="width:2em" id="anim-fps">FPS
+			</span>
+		</div><div class="bottom">
+			<div id="pan" style="--rpx-size: 1px" data-zoom="3200%" data-frame="0/4" data-sep=" · " class="panner zoomed" tabindex="0">
+				<div id="pan-ctr">
+					<img id="pan-under">
+					<canvas id="pan-image" width="16" height="16" style="transform: matrix(32, 0, 0, 32, 36, 27);"></canvas>
+					<div id="pan-notes"></div>
+				</div>
+			</div>
+		</div>
+	</td>
+	</tr></tbody></table>
+	<div id="readme-overlay" for="readme-toggle" class="overlay">
+		<label for="readme-toggle" class="overlay-fill"></label>
+		<div class="popup"><h1>GMSprView</h1><p>
+			This tool lets you view <code>GMSPR</code> files that old (Game Maker 8.1 and earlier)
+			versions of GameMaker can export.
+		</p><p>
+			Use the menu on the left to get started, or just drag-and-drop a <code>GMSPR</code> file onto this page.
+		</p><p>
+			<noscript>You'll need JavaScript enabled to actually do much, btw.</noscript>
+		</p><p>
+			Credits:
+		</p><ul><li>
+			Tool by <a href="https://yal.cc">YellowAfterlife</a>.
+		</li><li>
+			With file format research by <a href="https://twitter.com/mesetatron">meseta</a>.<br>
+			(see <a href="https://yal.cc/gamemaker-sprite_add_sprite-in-studio-studio-2/">blog post</a> for notes on the format)
+		</li><li>
+			Uses <a href="https://github.com/nodeca/pako/">pako</a> for decompression.
+		</li><li>
+			Written in <a href="https://haxe.org">Haxe</a>.
+		</li></ul></div>
+	</div>
+	<form class="hidden" id="form">
+		<input type="file" id="picker" accept=".gmspr">
+		<a href="" id="downloader"></a>
+	</form>
+	<svg width="0" height="0" style="position:absolute"><defs><clipPath id="pan-clip"></clipPath></defs></svg>
+	<script type="text/javascript">
+	(function() { // splitter
+		var sp = document.getElementById("splitter-td");
+		var eq = document.getElementById("nav-td");
+		var qq = document.getElementById("nav");
+		var gq = document.getElementById("main");
+		var lk = "gmsprview-splitter-width"
+		var ls = window.localStorage;
+		var sp_mousemove, sp_mouseup, sp_x, sp_y, sp_dw;
+		sp_mousemove = function(e) {
+			var nx = e.pageX, dx = nx - sp_x; sp_x = nx;
+			var ny = e.pageY, dy = ny - sp_y; sp_y = ny;
+			sp_dw += dx * (eq.parentElement.children[0] == eq ? 1 : -1);
+			var nw = Math.max(sp_dw, 150);
+			eq.setAttribute("width", nw);
+			qq.style.width = nw + "px";
+		};
+		sp_mouseup = function(e) {
+			document.removeEventListener("mousemove", sp_mousemove);
+			document.removeEventListener("mouseup", sp_mouseup);
+			gq.classList.remove("resizing");
+			if (ls) ls.setItem(lk, "" + eq.getAttribute("width"));
+		};
+		sp.addEventListener("mousedown", function(e) {
+			sp_x = e.pageX; sp_y = e.pageY;
+			sp_dw = parseFloat(eq.getAttribute("width"));
+			document.addEventListener("mousemove", sp_mousemove);
+			document.addEventListener("mouseup", sp_mouseup);
+			gq.classList.add("resizing");
+			e.preventDefault();
+		});
+		if (ls) {
+			var cw = parseFloat(ls.getItem(lk) || "200");
+			eq.setAttribute("width", cw)
+			qq.style.width = cw + "px";
+		}
+	})();
+	</script>
+	<script src="script.js"></script>
+	<script src="pako_inflate.js"></script>
+
+
+</body></html>

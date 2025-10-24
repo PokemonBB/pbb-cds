@@ -1,0 +1,14 @@
+{
+  "name": "pbb-cdn",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "probe": "node scripts/probe.js",
+    "extract": "node scripts/extract.js"
+  },
+  "devDependencies": {
+    "extract-zip": "^2.0.1",
+    "puppeteer": "^24.26.0"
+  }
+}
