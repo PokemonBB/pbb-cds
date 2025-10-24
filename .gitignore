@@ -5,3 +5,4 @@ GMSPR_EXTRACTOR/node_modules
 CONTENT
 CONTENT.zip
 node_modules
+.env
