@@ -25,8 +25,8 @@ async function registerSwagger(fastify) {
     }
   });
 
-  // Common Swagger UI configuration
-  const swaggerUIConfig = {
+  await fastify.register(require('@fastify/swagger-ui'), {
+    routePrefix: '/docs',
     uiConfig: {
       deepLinking: false,
       persistAuthorization: true
@@ -39,17 +39,33 @@ async function registerSwagger(fastify) {
     transformStaticCSP: (header) => header,
     transformSpecification: (swaggerObject, request, reply) => { return swaggerObject },
     transformSpecificationClone: true
-  };
+  });
 
-  // Register Swagger UI for multiple endpoints
-  const endpoints = ['/docs', '/swagger', '/api'];
-  
-  for (const endpoint of endpoints) {
-    await fastify.register(require('@fastify/swagger-ui'), {
-      routePrefix: endpoint,
-      ...swaggerUIConfig
-    });
-  }
+  fastify.get('/swagger', {
+    schema: { hide: true }
+  }, async (request, reply) => {
+    reply.redirect('/docs');
+  });
+
+  fastify.get('/api', {
+    schema: { hide: true }
+  }, async (request, reply) => {
+    reply.redirect('/docs');
+  });
+
+  fastify.get('/swagger/*', {
+    schema: { hide: true }
+  }, async (request, reply) => {
+    const rest = request.params['*'] || '';
+    reply.redirect(`/docs/${rest}`);
+  });
+
+  fastify.get('/api/*', {
+    schema: { hide: true }
+  }, async (request, reply) => {
+    const rest = request.params['*'] || '';
+    reply.redirect(`/docs/${rest}`);
+  });
 }
 
 module.exports = { registerSwagger };
